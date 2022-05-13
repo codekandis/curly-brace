@@ -1,0 +1,59 @@
+{
+	"name": "codekandis/curly-brace",
+	"description": "`codekandis/curly-brace` is a library providing cURL wrapper interfaces and classes to handle requests and responses.",
+	"keywords": [
+		"php",
+		"curly brace",
+		"curly",
+		"brace",
+		"curl",
+		"wrapper",
+		"interfaces",
+		"classes",
+		"headers",
+		"cookies",
+		"post fields",
+		"request",
+		"responses"
+	],
+	"minimum-stability": "stable",
+	"prefer-stable": true,
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Christian Ramelow",
+			"email": "info@codekandis.net",
+			"homepage": "https://codekandis.net",
+			"role": "Developer"
+		}
+	],
+	"support": {
+		"email": "info@codekandis.net",
+		"issues": "https://github.com/codekandis/curly-brace/issues",
+		"docs": "https://github.com/codekandis/curly-brace/blob/master/README.md",
+		"source": "https://github.com/codekandis/curly-brace/tree/master"
+	},
+	"require": {
+		"php": "^7.4"
+	},
+	"require-dev": {
+		"roave/security-advisories": "dev-master",
+		"codekandis/phpunit": "^3"
+	},
+	"autoload": {
+		"psr-4": {
+			"CodeKandis\\CurlyBrace\\": [
+				"src"
+			]
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"CodeKandis\\CurlyBrace\\Tests\\": [
+				"tests"
+			]
+		}
+	},
+	"scripts": {
+	}
+}
