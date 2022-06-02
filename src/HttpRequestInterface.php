@@ -3,7 +3,8 @@ namespace CodeKandis\CurlyBrace;
 
 use CodeKandis\CurlyBrace\Headers\Cookies\CookieJarInterface;
 use CodeKandis\CurlyBrace\Headers\RequestHeaderCollectionInterface;
-use CodeKandis\CurlyBrace\PostFields\PostFieldCollectionInterface;
+use CodeKandis\CurlyBrace\Queries\GetArgumentCollectionInterface;
+use CodeKandis\CurlyBrace\Queries\PostArgumentCollectionInterface;
 
 /**
  * Represents the interface of any HTTP request.
@@ -31,10 +32,16 @@ interface HttpRequestInterface
 	public function getHttpRequestMethod(): string;
 
 	/**
-	 * Gets the collection of post fields.
-	 * @return PostFieldCollectionInterface The collection of post fields.
+	 * Gets the collection of get arguments.
+	 * @return GetArgumentCollectionInterface The collection of get arguments.
 	 */
-	public function getPostFields(): PostFieldCollectionInterface;
+	public function getGetArguments(): GetArgumentCollectionInterface;
+
+	/**
+	 * Gets the collection of post arguments.
+	 * @return PostArgumentCollectionInterface The collection of post arguments.
+	 */
+	public function getPostArguments(): PostArgumentCollectionInterface;
 
 	/**
 	 * Adds additional cURL options.

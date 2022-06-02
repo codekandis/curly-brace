@@ -13,9 +13,9 @@ class ResponseHeader extends Header implements ResponseHeaderInterface
 	 * @param string $headerString The header string to create the new response header from.
 	 * @return ResponseHeaderInterface The new response header.
 	 */
-	public static function fromString( string $headerString ): ResponseHeaderInterface
+	public static function fromHeaderString( string $headerString ): ResponseHeaderInterface
 	{
-		return parent::fromHeader( $headerString );
+		return parent::fromString( $headerString );
 	}
 
 	/**
@@ -33,6 +33,6 @@ class ResponseHeader extends Header implements ResponseHeaderInterface
 	 */
 	public static function fromResponseHeader( ResponseHeaderInterface $responseHeader ): ResponseHeaderInterface
 	{
-		return parent::fromHeader( $responseHeader );
+		return static::fromHeader( $responseHeader );
 	}
 }

@@ -12,8 +12,10 @@ use CodeKandis\CurlyBrace\Headers\RequestHeaderInterface;
 use CodeKandis\CurlyBrace\Headers\ResponseHeader;
 use CodeKandis\CurlyBrace\Headers\ResponseHeaderCollection;
 use CodeKandis\CurlyBrace\Headers\ResponseHeaderCollectionInterface;
-use CodeKandis\CurlyBrace\PostFields\PostFieldCollection;
-use CodeKandis\CurlyBrace\PostFields\PostFieldCollectionInterface;
+use CodeKandis\CurlyBrace\Queries\GetArgumentCollection;
+use CodeKandis\CurlyBrace\Queries\GetArgumentCollectionInterface;
+use CodeKandis\CurlyBrace\Queries\PostArgumentCollection;
+use CodeKandis\CurlyBrace\Queries\PostArgumentCollectionInterface;
 use function array_map;
 use function array_merge;
 use function count;
@@ -32,6 +34,7 @@ use const CURLOPT_HEADERFUNCTION;
 use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
+use const CURLOPT_URL;
 
 /**
  * Represents a HTTP request.
@@ -65,10 +68,16 @@ class HttpRequest implements HttpRequestInterface
 	private string $httpRequestMethod = HttpRequestMethods::GET;
 
 	/**
-	 * Stores the post fields.
-	 * @var PostFieldCollectionInterface
+	 * Stores the get arguments.
+	 * @var GetArgumentCollectionInterface
 	 */
-	private PostFieldCollectionInterface $postFields;
+	private GetArgumentCollectionInterface $getArguments;
+
+	/**
+	 * Stores the post arguments.
+	 * @var PostArgumentCollectionInterface
+	 */
+	private PostArgumentCollectionInterface $postArguments;
 
 	/**
 	 * Stores the additional cURL options.
@@ -139,18 +148,35 @@ class HttpRequest implements HttpRequestInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getPostFields(): PostFieldCollectionInterface
+	public function getGetArguments(): GetArgumentCollectionInterface
 	{
-		return $this->postFields ?? $this->postFields = new PostFieldCollection();
+		return $this->getArguments ?? $this->getArguments = new GetArgumentCollection();
 	}
 
 	/**
-	 * Sets the collection of post fields.
-	 * @param PostFieldCollectionInterface $postFields The collection of post fields.
+	 * Sets the collection of get arguments.
+	 * @param GetArgumentCollectionInterface $getArguments The collection of get arguments.
 	 */
-	public function setPostFields( PostFieldCollectionInterface $postFields ): void
+	public function setGetArguments( GetArgumentCollectionInterface $getArguments ): void
 	{
-		$this->postFields = $postFields;
+		$this->getArguments = $getArguments;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getPostArguments(): PostArgumentCollectionInterface
+	{
+		return $this->postArguments ?? $this->postArguments = new PostArgumentCollection();
+	}
+
+	/**
+	 * Sets the collection of post arguments.
+	 * @param PostArgumentCollectionInterface $postArguments The collection of post arguments.
+	 */
+	public function setPostArguments( PostArgumentCollectionInterface $postArguments ): void
+	{
+		$this->postArguments = $postArguments;
 	}
 
 	/**
@@ -189,16 +215,36 @@ class HttpRequest implements HttpRequestInterface
 	}
 
 	/**
-	 * Applies the post fields to a cURL handle.
-	 * @param resource $curlHandle The cURL handle to apply the post fields to.
+	 * Applies the URI with additional get arguments to a cURL handle.
+	 * @param resource $curlHandle The cURL handle to apply the URI with additional get arguments to.
 	 */
-	private function applyPostFields( $curlHandle ): void
+	private function applyUriWithGetArguments( $curlHandle ): void
+	{
+		curl_setopt(
+			$curlHandle,
+			CURLOPT_URL,
+			0 === count( $this->getGetArguments() )
+				? $this->uri
+				: sprintf(
+				'%s?%s',
+				$this->uri,
+				$this->getGetArguments()
+					 ->getFullGetArgumentString()
+			)
+		);
+	}
+
+	/**
+	 * Applies the post arguments to a cURL handle.
+	 * @param resource $curlHandle The cURL handle to apply the post arguments to.
+	 */
+	private function applyPostArguments( $curlHandle ): void
 	{
 		curl_setopt(
 			$curlHandle,
 			CURLOPT_POSTFIELDS,
-			$this->getPostFields()
-				 ->getFullPostFieldString()
+			$this->getPostArguments()
+				 ->getFullPostArgumentString()
 		);
 	}
 
@@ -277,13 +323,14 @@ class HttpRequest implements HttpRequestInterface
 	 */
 	public function send(): HttpRequestResultInterface
 	{
-		$curlHandle = curl_init( $this->uri );
+		$curlHandle = curl_init();
 
 		curl_setopt( $curlHandle, CURLOPT_CUSTOMREQUEST, $this->getHttpRequestMethod() );
 		curl_setopt( $curlHandle, CURLOPT_RETURNTRANSFER, true );
 
 		$this->applyHeaders( $curlHandle );
-		$this->applyPostFields( $curlHandle );
+		$this->applyUriWithGetArguments( $curlHandle );
+		$this->applyPostArguments( $curlHandle );
 
 		$responseHeaders = new ResponseHeaderCollection();
 		$this->applyResponseHeaderFunction( $curlHandle, $responseHeaders );

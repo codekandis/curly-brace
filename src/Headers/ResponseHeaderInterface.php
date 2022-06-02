@@ -13,4 +13,5 @@ interface ResponseHeaderInterface extends HeaderInterface
 	 * @param ResponseHeaderInterface $responseHeader The response header to create the header from.
 	 * @return ResponseHeaderInterface The new response header.
 	 */
+	public static function fromResponseHeader( ResponseHeaderInterface $responseHeader ): ResponseHeaderInterface;
 }

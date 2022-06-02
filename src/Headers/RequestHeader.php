@@ -13,9 +13,9 @@ class RequestHeader extends Header implements RequestHeaderInterface
 	 * @param string $headerString The header string to create the new request header from.
 	 * @return RequestHeaderInterface The new request header.
 	 */
-	public static function fromString( string $headerString ): RequestHeaderInterface
+	public static function fromHeaderString( string $headerString ): RequestHeaderInterface
 	{
-		return parent::fromHeader( $headerString );
+		return parent::fromString( $headerString );
 	}
 
 	/**
@@ -33,6 +33,6 @@ class RequestHeader extends Header implements RequestHeaderInterface
 	 */
 	public static function fromRequestHeader( RequestHeaderInterface $requestHeader ): RequestHeaderInterface
 	{
-		return parent::fromHeader( $requestHeader );
+		return static::fromHeader( $requestHeader );
 	}
 }

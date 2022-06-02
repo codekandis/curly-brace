@@ -38,7 +38,7 @@ class Header implements HeaderInterface
 	 * @param string $headerString The header string to create the new header from.
 	 * @return HeaderInterface The new header.
 	 */
-	public static function fromString( string $headerString ): HeaderInterface
+	public static function fromHeaderString( string $headerString ): HeaderInterface
 	{
 		$preparedHeader = explode( ':', $headerString, 2 );
 
