@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [keep a changelog][xtlink-keep-a-changelog]
 and this project adheres to [Semantic Versioning 2.0.0][xtlink-semantic-versioning].
 
+## [0.2.0] - 2022-06-02
+
+### Fixed
+
+* static header constructors
+
+### Changed
+
+* namespace, interface names and class names of the POST query arguments.
+
+### Added
+
+* GET query arguments
+
+[0.2.0]: https://github.com/codekandis/curly-brace/compare/0.1.0..0.2.0
+
+---
 ## [0.1.0] - 2022-05-17
 
 ### Added
