@@ -12,6 +12,8 @@ use CodeKandis\CurlyBrace\Headers\RequestHeaderInterface;
 use CodeKandis\CurlyBrace\Headers\ResponseHeader;
 use CodeKandis\CurlyBrace\Headers\ResponseHeaderCollection;
 use CodeKandis\CurlyBrace\Headers\ResponseHeaderCollectionInterface;
+use CodeKandis\CurlyBrace\Queries\GetArgumentCollection;
+use CodeKandis\CurlyBrace\Queries\GetArgumentCollectionInterface;
 use CodeKandis\CurlyBrace\Queries\PostArgumentCollection;
 use CodeKandis\CurlyBrace\Queries\PostArgumentCollectionInterface;
 use function array_map;
@@ -32,6 +34,7 @@ use const CURLOPT_HEADERFUNCTION;
 use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
+use const CURLOPT_URL;
 
 /**
  * Represents a HTTP request.
@@ -63,6 +66,12 @@ class HttpRequest implements HttpRequestInterface
 	 * @var string
 	 */
 	private string $httpRequestMethod = HttpRequestMethods::GET;
+
+	/**
+	 * Stores the get arguments.
+	 * @var GetArgumentCollectionInterface
+	 */
+	private GetArgumentCollectionInterface $getArguments;
 
 	/**
 	 * Stores the post arguments.
@@ -139,6 +148,23 @@ class HttpRequest implements HttpRequestInterface
 	/**
 	 * {@inheritDoc}
 	 */
+	public function getGetArguments(): GetArgumentCollectionInterface
+	{
+		return $this->getArguments ?? $this->getArguments = new GetArgumentCollection();
+	}
+
+	/**
+	 * Sets the collection of get arguments.
+	 * @param GetArgumentCollectionInterface $getArguments The collection of get arguments.
+	 */
+	public function setGetArguments( GetArgumentCollectionInterface $getArguments ): void
+	{
+		$this->getArguments = $getArguments;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public function getPostArguments(): PostArgumentCollectionInterface
 	{
 		return $this->postArguments ?? $this->postArguments = new PostArgumentCollection();
@@ -186,6 +212,26 @@ class HttpRequest implements HttpRequestInterface
 		);
 
 		curl_setopt( $curlHandle, CURLOPT_HTTPHEADER, $headers );
+	}
+
+	/**
+	 * Applies the URI with additional get arguments to a cURL handle.
+	 * @param resource $curlHandle The cURL handle to apply the URI with additional get arguments to.
+	 */
+	private function applyUriWithGetArguments( $curlHandle ): void
+	{
+		curl_setopt(
+			$curlHandle,
+			CURLOPT_URL,
+			0 === count( $this->getGetArguments() )
+				? $this->uri
+				: sprintf(
+				'%s?%s',
+				$this->uri,
+				$this->getGetArguments()
+					 ->getFullGetArgumentString()
+			)
+		);
 	}
 
 	/**
@@ -277,12 +323,13 @@ class HttpRequest implements HttpRequestInterface
 	 */
 	public function send(): HttpRequestResultInterface
 	{
-		$curlHandle = curl_init( $this->uri );
+		$curlHandle = curl_init();
 
 		curl_setopt( $curlHandle, CURLOPT_CUSTOMREQUEST, $this->getHttpRequestMethod() );
 		curl_setopt( $curlHandle, CURLOPT_RETURNTRANSFER, true );
 
 		$this->applyHeaders( $curlHandle );
+		$this->applyUriWithGetArguments( $curlHandle );
 		$this->applyPostArguments( $curlHandle );
 
 		$responseHeaders = new ResponseHeaderCollection();
